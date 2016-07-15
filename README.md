@@ -489,9 +489,106 @@ Finally, we already know that our Bootstrap `.btn-group` elements are repeated t
 
 Things are starting to look pretty good! Let's spend some time focusing on our palette preview button groups. It looks like we basically have two representations of a color palette - One with colors, and an empty one that doesn't have any color blocks yet. Both are shaped the same, with five equally sized sections, but there are some slight differences in border styling.
 
-:
+Let's start by creating a new custom class called `color-palette` that we will apply to all the button groups we're using as color-palette previews.
+
 ```
+<a href="palette.html" class="btn-group color-palette">
+	<button ... >217,33,32</button>
+	<button ...>231,116,47</button>
+	<button ...>223,165,58</button>
+	<button ...>177,190,78</button>
+	<button ...>109,179,136</button>
+</a>
 ```
+
+We'll also add the color-palette class to our empty color palette, but we'll give that element an additional custom class called `.empty-palette`
+
+```
+<h2>Add a Palette</h2>
+<a href="palette.html" class="btn-group color-palette empty-palette">
+	<button class="btn" type="button"></button>
+	<button class="btn" type="button"></button>
+	<button class="btn" type="button"></button>
+	<button class="btn" type="button"></button>
+	<button class="btn" type="button"></button>
+</a>
+```
+
+Now that we have custom classes add to our HTML, we can edit the styles that the elements will share.
+
+```
+.color-palette .btn {
+  width: 20%;
+  height: 50px;
+  border: none;
+  font-size: 10px;
+  color: transparent;
+}
+```
+Hmmmmmm. That's odd. There's a second class listed in our selector!
+> CSS selectors can be chained. The notation above means "find all the elements with the `.color-palette` class and then drill down to all of the nested elements *inside* that element that have the `.btn` class and apply the following styles to those elements.
+>
+
+Let's take a look at one more example. Here, we're using the same nested selector `.color-palette .btn`, but we're adding one more layer of specificity using a *pseudo-class*, which is essentially a conditional class that gets applied when the user interacts with different elements on the page, such as hovering over an element.
+
+```
+.color-palette .btn:hover, .color-palette .btn:focus {
+  color: #1C1F24;
+  border: 2px solid #1C1F24;
+}
+```
+You can apply the same style to several different selectors by separating them with a comma. Save and refresh your browser window. What happens when you hover over one of the color buttons now?
+
+Finally, let's add the styling for our special empty-palette. Remember, order matters in your CSS file.
+```
+.empty-palette .btn {
+  background-color: transparent;
+  border: 1px solid #586073;
+}
+
+.empty-palette:hover .btn {
+  border: 1px solid white;
+}
+```
+> ##### <i class="icon-star"></i> Challenge Time!
+> Use the following custom classes and style attributes to style the rest of the palette form:
+> 
+> **Custom classes and nested selectors**
+> ```
+> .palette-name-input {}
+>.preview-tile {}
+>.color-input-group {}
+>.color-input-label {}
+>.color-text-input {}
+>.color-input-group .color-range-input {}
+>.fom-actions .btn {}
+>.form-actions .btn:hover {}
+>```
+>
+> **Style attributes and values**
+> ```
+> width: 10%;
+> width: 33.3%;
+> width: 20%;
+> width: 68%;
+> width: 100%;
+> height: 50px;  
+> margin: 2%;
+> margin-top: 12px;
+> margin-top: 18px;
+> margin-top: 24px;
+> margin-bottom: 6px;
+> margin-bottom: 18px;
+> margin-bottom: 24px;  
+> padding: 12px;  
+> color: white;
+> background-color: #586073;
+> border: 1px solid #1C1F24;
+> font-size: 24px;
+> vertical-align: middle;
+> display: inline-block;
+> opacity: .8;
+>```
 
 ### <i class="icon-star"></i> Phase 3 - *Interaction Design*
 ![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/new-palette.gif?raw=true)
