@@ -590,31 +590,464 @@ Finally, let's add the styling for our special empty-palette. Remember, order ma
 > opacity: .8;
 >```
 
-### <i class="icon-star"></i> Phase 3 - *Interaction Design*
-![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/new-palette.gif?raw=true)
-#### Intro to JavaScript
-#### Working with JQuery 
-> ![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/basic-nav.gif?raw=true)
-
-### <i class="icon-star"></i> Phase 4 - *Building the Application Code*
+### <i class="icon-star"></i> Phase 3 - *Building the Application Code*
 #### The anatomy of the web
 #### Bootstrapping a new Ember application
 #### The Ember Router
 #### Ember Routes
 
-### <i class="icon-star"></i> Phase 5 - *Building a CRUD application using MVC Pattern*
+`ember new color-palette`
+Wait
+
+`cd color-palette`
+`ember server`
+
+`http://localhost:4200`
+Welcome to Ember
+Yay!
+
+`ember g route palettes`
+```
+installing route
+	create app/routes/palettes.js
+	create app/templates/palettes.hbs
+updating router
+	add route palettes
+installing route-test
+	create tests/unit/routes/palettes-test.js
+```
+`ember g route palettes/new`
+```
+installing route
+	create app/routes/palettes/new.js
+	create app/templates/palettes/new.hbs
+updating router
+	add route palettes/new
+installing route-test
+	create tests/unit/routes/palettes/new-test.js
+```
+`ember g route palettes/edit`
+```
+installing route
+	create app/routes/palettes/edit.js
+	create app/templates/palettes/edit.hbs
+updating router
+	add route palettes/edit
+installing route-test
+	create tests/unit/routes/palettes/edit-test.js
+```
+`ember g template palettes/index`
+```
+installing template
+	create app/templates/palettes/index.hbs
+```
+`ember install ember-bootstrap`
+
+`ember g template _palette-form`
+
+Copy over templates:
+```
+<!-- app/templates/application.hbs -->
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-sm-8 col-md-offset-3 col-sm-offset-2">
+        {{outlet}}
+      </div>
+    </div>
+  </body>
+```
+```
+<!-- app/templates/palettes/index.hbs -->
+<h1>Color Palettes</h1>
+
+<h2>Add a Palette</h2>
+<a href="palette.html" class="btn-group color-palette empty-palette">
+  <button class="btn" type="button"></button>
+  <button class="btn" type="button"></button>
+  <button class="btn" type="button"></button>
+  <button class="btn" type="button"></button>
+  <button class="btn" type="button"></button>
+</a>
+
+<h2>Tropical</h2>
+<a href="palette.html" class="btn-group color-palette">
+  <button class="btn" type="button" style="background-color:rgb(217,33,32)" >217,33,32</button>
+  <button class="btn" type="button" style="background-color:rgb(231,116,47)">231,116,47</button>
+  <button class="btn" type="button" style="background-color:rgb(223,165,58)">223,165,58</button>
+  <button class="btn" type="button" style="background-color:rgb(177,190,78)">177,190,78</button>
+  <button class="btn" type="button" style="background-color:rgb(109,179,136)">109,179,136</button>
+</a>
+
+<h2>Cool</h2>
+<a href="palette.html" class="btn-group color-palette">
+  <button class="btn" type="button" style="background-color:rgb(70,131,193)">70,131,193</button>
+  <button class="btn" type="button" style="background-color:rgb(63,78,161)">63,78,161</button>
+  <button class="btn" type="button" style="background-color:rgb(120,28,129)">120,28,129</button>
+  <button class="btn" type="button" style="background-color:rgb(0,0,0)">0,0,0</button>
+  <button class="btn" type="button" style="background-color:rgb(238,238,238)">238,238,238</button>
+</a>
+```
+
+```
+<!-- app/templates/-palette-form.hbs -->
+<h1>Tropical</h1>
+<form>
+  <h2>Palette Name</h2>
+  <input class="palette-name-input form-control" type="text" placeholder="New Palette">
+
+  <h2>Palette Preview</h2>
+  <div class="btn-group color-palette">
+    <button class="btn" type="button" style="background-color:rgb(217,33,32)" >217,33,32</button>
+    <button class="btn" type="button" style="background-color:rgb(231,116,47)">231,116,47</button>
+    <button class="btn" type="button" style="background-color:rgb(223,165,58)">223,165,58</button>
+    <button class="btn" type="button" style="background-color:rgb(177,190,78)">177,190,78</button>
+    <button class="btn" type="button" style="background-color:rgb(109,179,136)">109,179,136</button>
+  </div>
+
+  <h2>Edit Color</h2>
+  <div class="btn-group">
+    <div class="btn preview-tile" style="background-color:rgb(217,33,32)"></div>
+  </div>
+  <div class="color-input-group">
+    <span class="color-input-label">R</span>
+    <input class="color-text-input form-control" maxlength="3" type="text">
+    <input class="color-range-input pull-right" type="range" step=1 min=0 max=255>
+  </div>
+  <div class="color-input-group">
+    <span class="color-input-label">G</span>
+    <input class="color-text-input form-control" maxlength="3" type="text">
+    <input class="color-range-input pull-right" type="range" step=1 min=0 max=255>
+  </div>
+  <div class="color-input-group">
+    <span class="color-input-label">B</span>
+    <input class="color-text-input form-control" maxlength="3" type="text">
+    <input class="color-range-input pull-right" type="range" step=1 min=0 max=255>
+  </div>
+
+  <div class="btn-group form-actions" role="group">
+    <a class="btn" href="palettes.html">Cancel</a>
+    <a class="btn" href="palettes.html">Delete</a>
+    <input class="btn" type="submit" value="Save">
+  </div>
+</form>
+```
+
+Copy over Styles
+
+```
+/* app/styles/app.css */
+
+body {
+  background-color: #1C1F24;
+  color: #586073;
+}
+
+h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 70px;
+  margin-top: 50px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+.btn-group {
+  width: 100%;
+  margin-bottom: 12px;
+  margin-top: 12px;
+}
+
+.color-palette .btn {
+  width: 20%;
+  height: 50px;
+  border: none;
+  font-size: 10px;
+  color: transparent;
+}
+
+.color-palette .btn:hover, .color-palette .btn:focus {
+  color: #1C1F24;
+  border: 2px solid #1C1F24;
+}
+
+.empty-palette .btn {
+  background-color: transparent;
+  border: 1px solid #586073;
+}
+
+.empty-palette:hover .btn {
+  border: 1px solid white;
+}
+
+.palette-name-input {
+  width: 100%;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.preview-tile {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 18px;
+}
+
+.color-input-group {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.color-input-label {
+  font-size: 24px;
+  width: 10%;
+  vertical-align: middle;
+}
+
+.color-text-input {
+  width: 20%;
+  margin: 2%;
+  display: inline-block;
+}
+
+.color-input-group .color-range-input {
+  width: 68%;
+  margin-top: 18px;
+}
+
+.form-actions .btn {
+  width: 33.3%;
+  padding: 12px;
+  margin-top: 12px;
+  background-color: #586073;
+  border: 1px solid #1C1F24;
+  color: white;
+}
+
+.form-actions .btn:hover {
+  opacity: .8;
+}
+
+```
+Add font
+`@import url(https://fonts.googleapis.com/css?family=Pacifico);`
+
+----------------------
+Parity
+-------------------
+
+replace `<a>` tags with `{{#link-to}} {{/link-to}}`
+`{{#link-to 'palettes.edit'}}{{/link-to}}`
+`{{#link-to 'palettes.new'}}{{/link-to}}`
+`{{#link-to 'palettes'}}{{/link-to}}`
+
+
+----------
+Dynamic Content
+Specify models:
+```
+/* app/routes/palettes.js */
+
+import Ember from 'ember';
+
+export default Ember.Route.extend({
+  model() {
+    return [
+      {
+        id: 1,
+        name: 'Tropical',
+        creator: 'YOUR NAME',
+        colors: [
+          { r: 217, g: 33, b: 32, styleString: 'background-color:rgb(217,33,32)', labelString: '217,33,32'},
+          { r: 231, g: 116, b: 47, styleString: 'background-color:rgb(231,116,47)', labelString: '231,116,47'},
+          { r: 223, g: 165, b: 58, styleString: 'background-color:rgb(223,165,58)', labelString: '223,165,58'},
+          { r: 177, g: 190, b: 78, styleString: 'background-color:rgb(177,190,78)', labelString: '177,190,78'},
+          { r: 109, g: 179, b: 136, styleString: 'background-color:rgb(109,179,136)', labelString: '109,179,136'}
+        ]
+      },
+      {
+        id: 2,
+        name: 'Cool',
+        creator: 'YOUR NAME',
+        colors: [
+          { r: 70, g: 131, b: 193, styleString: 'background-color:rgb(70,131,193)', labelString: '70,131,193'},
+          { r: 63, g: 78, b: 161, styleString: 'background-color:rgb(63,78,161)', labelString: '63,78,161'},
+          { r: 120, g: 28, b: 129, styleString: 'background-color:rgb(120,28,129)', labelString: '120,28,129'},
+          { r: 0, g: 0, b: 0, styleString: 'background-color:rgb(0,0,0)', labelString: '0, 0, 0'},
+          { r: 238, g: 238, b: 238, styleString: 'background-color:rgb(238,238,238)', labelString: '238,238,238'}
+        ]
+      }
+    ];
+  }
+});
+
+```
+```
+/* app/routes/palettes/edit.js and app/routes/palettes/new.js */
+import Ember from 'ember';
+
+export default Ember.Route.extend({
+  model() {
+    return {
+      id: 1,
+      name: 'Tropical',
+      creator: 'YOUR NAME',
+      colors: [
+        { r: 217, g: 33, b: 32, styleString: 'background-color:rgb(217,33,32)', labelString: '217,33,32'},
+        { r: 231, g: 116, b: 47, styleString: 'background-color:rgb(231,116,47)', labelString: '231,116,47'},
+        { r: 223, g: 165, b: 58, styleString: 'background-color:rgb(223,165,58)', labelString: '223,165,58'},
+        { r: 177, g: 190, b: 78, styleString: 'background-color:rgb(177,190,78)', labelString: '177,190,78'},
+        { r: 109, g: 179, b: 136, styleString: 'background-color:rgb(109,179,136)', labelString: '109,179,136'}
+      ]
+    };
+  }
+});
+```
+
+----------
+Swap out lists for `{{#each}}{{/each}}` and convert to static context with dynamic content
+```
+<!-- app/templates/palettes/index.hbs -->
+...
+{{#each model as |palette|}}
+  <h2>{{palette.name}}</h2>
+  {{#link-to 'palettes.edit' class="btn-group color-palette"}}
+    {{#each palette.colors as |color|}}
+      <button class="btn" type="button" style={{color.styleString}} >{{color.labelString}}</button>
+    {{/each}}
+  {{/link-to}}
+{{/each}}
+```
+
+```
+<!-- app/templates/-palette-form.hbs -->
+
+<h1>{{model.name}}</h1>
+<form>
+  <h2>Palette Name</h2>
+  <input class="palette-name-input form-control" type="text" placeholder="New Palette">
+
+  <h2>Palette Preview</h2>
+  <div class="btn-group color-palette">
+    {{#each model.colors as |color|}}
+      <button class="btn" type="button" style={{color.styleString}}>{{color.labelString}}</button>
+    {{/each}}
+  </div>
+  ...
+
+```
+----------
+
+Controllers and actions
+
+`ember g controller palettes/edit`
+```
+installing controller
+  create app/controllers/palettes/edit.js
+installing controller-test
+  create tests/unit/controllers/palettes/edit-test.js
+```
+
+`ember g controller palettes/new`
+```
+installing controller
+  create app/controllers/palettes/new.js
+installing controller-test
+  create tests/unit/controllers/palettes/new-test.js
+```
+
+Controller:
+```
+/* app/controllers/palettes/new.js and app/controllers/palettes/edit.js */
+import Ember from 'ember';
+
+export default Ember.Controller.extend({
+  focusColor: null,
+  actions: {
+    setFocusColor(color) {
+      this.set('focusColor', color);
+    }
+  }
+});
+```
+
+connect actions and dynamic controller properties
+```
+<!-- app/templates/-palette-form.hbs -->
+...
+<h2>Palette Preview</h2>
+  <div class="btn-group color-palette">
+    {{#each model.colors as |color|}}
+      <button class="btn" type="button" style={{color.styleString}} {{action 'setFocusColor' color}}>{{color.labelString}}</button>
+    {{/each}}
+  </div>
+
+  <h2>Edit Color</h2>
+  <div class="btn-group">
+    <div class="btn preview-tile" style={{focusColor.styleString}}></div>
+  </div>
+  
+...
+```
+![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/set-focus-color.gif?raw=true)
+
+----------
+
+Input helpers - bound properties
+
+
+----------
+`ember install emberfire`
+
+Add keys to config/environment.js
+```
+// config/environment.js
+
+module.exports = function(environment) {
+	var ENV = {
+		firebase: {
+		   apiKey: "AIzaSyBvdiz729ZWt5XUHQhsaEeR1MrO53Q_FyA",
+		   authDomain: "emberitas-color-palette.firebaseapp.com",
+		   databaseURL: "https://emberitas-color-palette.firebaseio.com",
+		   storageBucket: "emberitas-color-palette.appspot.com"
+		 },
+		 ...
+```
+-------------
+Generate models
+`ember g model palette`
+
+```
+installing model
+  create app/models/palette.js
+installing model-test
+  create tests/unit/models/palette-test.js
+```
+
+`ember g model color`
+
+```
+installing model
+  create app/models/color.js
+installing model-test
+  create tests/unit/models/color-test.js
+```
+
+### <i class="icon-star"></i> Phase 4 - *Building a CRUD application using MVC Pattern*
 #### Working with Records
 #### Intro to Model View Controller (MVC) Pattern - or in our case, M *T* C
 #### Templates
 #### Models
 #### Controllers
 
-### <i class="icon-star"></i> Phase 6 - *Persistence*
+### <i class="icon-star"></i> Phase 5 - *Persistence*
 #### Understanding "front-end" vs "back-end"
 #### Intro to Ember Data
 #### Intro to working with APIs (Firebase)
 
-### <i class="icon-star"></i> Phase 7 - *Deployment - Making the application available to users*
+### <i class="icon-star"></i> Phase 6 - *Deployment - Making the application available to users*
 #### Understanding DNS and hosting
 #### Intro to Pagefront
 
