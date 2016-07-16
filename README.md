@@ -996,7 +996,59 @@ connect actions and dynamic controller properties
 ----------
 
 Input helpers - bound properties
+```
+<h2>Palette Name</h2>
+  {{input value=model.name class="palette-name-input form-control" type="text" placeholder="New Palette"}}
 
+  <h2>Palette Preview</h2>
+  <div class="btn-group color-palette">
+    {{#each model.colors as |color|}}
+      <button class="btn" type="button" style={{color.styleString}} {{action 'setFocusColor' color}}>{{color.labelString}}</button>
+    {{/each}}
+  </div>
+
+  <h2>Edit Color</h2>
+  <div class="btn-group">
+    <div class="btn preview-tile" style={{focusColor.styleString}}></div>
+  </div>
+  <div class="color-input-group">
+    <span class="color-input-label">R</span>
+    {{input value=focusColor.r class="color-text-input form-control" maxlength="3" type="text"}}
+    {{input value=focusColor.r class="color-range-input pull-right" type="range" step=1 min=0 max=255}}
+  </div>
+  <div class="color-input-group">
+    <span class="color-input-label">G</span>
+    {{input value=focusColor.g class="color-text-input form-control" maxlength="3" type="text"}}
+    {{input value=focusColor.g class="color-range-input pull-right" type="range" step=1 min=0 max=255}}
+  </div>
+  <div class="color-input-group">
+    <span class="color-input-label">B</span>
+    {{input value=focusColor.b class="color-text-input form-control" maxlength="3" type="text"}}
+    {{input value=focusColor.b class="color-range-input pull-right" type="range" step=1 min=0 max=255}}
+  </div>
+```
+
+![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/bound-properties.gif?raw=true)
+
+---------
+
+Computed properties
+```
+...
+focusColorStyleString: Ember.computed('focusColor.r', 'focusColor.g', 'focusColor.b', function() {
+    var r = this.get('focusColor.r');
+    var g = this.get('focusColor.g');
+    var b = this.get('focusColor.b');
+    if (r || g || b) {
+      return Ember.String.htmlSafe(`background-color:rgb(${r}, ${g}, ${b})`);
+    } else {
+      return Ember.String.htmlSafe('background-color:transparent; border:1px solid #586073');
+    }
+  })
+  ...
+```
+
+![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/computed-property.gif?raw=true)
 
 ----------
 `ember install emberfire`
@@ -1034,6 +1086,208 @@ installing model
 installing model-test
   create tests/unit/models/color-test.js
 ```
+
+combine computed properties and fixture structure. Has many, belongs to
+MAKE SURE THEY CHANGE THE CREATOR DEFAULT TO THEIR OWN NAME
+```
+import Model from 'ember-data/model';
+import attr from 'ember-data/attr';
+import { hasMany } from 'ember-data/relationships';
+
+export default Model.extend({
+  name: attr({ defaultValue: 'New Palette' }),
+  creator: attr({ defaultValue: 'YOUR NAME' }),
+  colors: hasMany('color', {async: false})
+});
+```
+
+```
+import Model from 'ember-data/model';
+import attr from 'ember-data/attr';
+import Ember from 'ember';
+import { belongsTo } from 'ember-data/relationships';
+
+export default Model.extend({
+  palette: belongsTo('palette', { async: false }),
+  r: attr({ defaultValue: 0 }),
+  g: attr({ defaultValue: 0 }),
+  b: attr({ defaultValue: 0 }),
+  styleString: Ember.computed('r', 'g', 'b', function() {
+    var r = this.get('r');
+    var g = this.get('g');
+    var b = this.get('b');
+    if (r || g || b) {
+      return Ember.String.htmlSafe(`background-color:rgb(${r}, ${g}, ${b})`);
+    } else {
+      return Ember.String.htmlSafe('background-color:transparent; border:1px solid #586073');
+    }
+  }),
+  labelString: Ember.computed('r', 'g', 'b', function() {
+    var r = this.get('r');
+    var g = this.get('g');
+    var b = this.get('b');
+    if (r || g || b) {
+      return Ember.String.htmlSafe(`${this.get('r')}, ${this.get('g')}, ${this.get('b')}`);
+    } else {
+      return '';
+    }
+  }),
+});
+```
+
+----
+
+rigging up real models to routes
+Replace palettes route model hook with real data! Note special syntax JUST for firebase
+```
+model: function() {
+   return this.store.query('palette', {
+     orderBy: 'creator',
+     equalTo: 'Fixture'
+   });
+ }
+```
+BROKEN!
+Need a serializer
+`ember g serializer palette`
+
+```
+import FirebaseSerializer from 'emberfire/serializers/firebase';
+export default FirebaseSerializer.extend({
+  attrs: {
+    colors: {embedded: 'always'}
+  }
+});
+```
+
+YAY! RECORDS FROM THE SERVER!
+![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/fixture-endpoint.png?raw=true)
+
+SWAP OUT THE FILTER FOR YOUR OWN NAME AGAIN
+```
+model: function() {
+   return this.store.query('palette', {
+     orderBy: 'creator',
+     equalTo: 'YOUR NAME'
+   });
+ }
+```
+
+-----------
+Create model:
+```
+import Ember from 'ember';
+
+export default Ember.Route.extend({
+  model() {
+    // add a new palette to our local store
+    var newPalette = this.store.createRecord('palette', {});
+    // isolate the colors property of our new palette
+    var colors = newPalette.get('colors');
+    // add five empty color records to the palette
+    for (var i=0; i<5; i++) {
+      colors.addObject(this.store.createRecord('color', {}));
+    }
+    return newPalette;
+  },
+  afterModel(model) {
+    // select the first color and make that the active color for editing
+    this.controllerFor('palettes.new').set('focusColor', model.get('colors.firstObject'));
+  }
+});
+```
+
+Add create action to form
+
+```
+actions: {
+    setFocusColor(color) {
+      this.set('focusColor', color);
+    },
+    savePalette() {
+      var palette = this.get('model');
+      palette.save().then(() => {this.transitionToRoute('palettes.index');}, (err) => {console.log(err);});
+    }
+  }
+```
+
+`<form {{action 'savePalette' on='submit'}}>`
+
+YAY! We can create REAL records!
+
+Now, for edit:
+Dynamic segments - and while we're at it - setting the index route:
+
+update router.js
+```
+Router.map(function() {
+  this.route('palettes', { path: '/'},  function() {
+    this.route('new');
+    this.route('edit', { path: '/palettes/:palette_id' });
+  });
+});
+```
+Restart your server!
+
+swap out the model for something real:
+```
+export default Ember.Route.extend({
+  model(params) {
+    return this.get('store').findRecord('palette', params.palette_id);
+  },
+  afterModel(model) {
+    this.controllerFor('palettes.edit').set('focusColor', model.get('colors.firstObject'));
+  }
+});
+```
+Fix links to use dynamic segment!
+`{{#link-to 'palettes.edit' palette.id class="btn-group color-palette"}}`
+
+Add save, delete and cancel actions
+```
+savePalette() {
+      var palette = this.get('model');
+      palette.save().then(() => {this.transitionToRoute('palettes.index');}, (err) => {Ember.Logger.log(err);});
+ },
+ cancel() {
+   var palette = this.get('model');
+   palette.rollbackAttributes();
+   var colors = palette.get('colors');
+   colors.forEach((color)=>{
+     color.rollbackAttributes();
+   });
+   this.transitionToRoute('palettes');
+ },
+ deletePalette() {
+   var palette = this.get('model');
+   palette.destroyRecord();
+   this.transitionToRoute('palettes');
+ }
+```
+
+Add actions to new view buttons
+```
+cancel() {
+   this.transitionToRoute('palettes');
+ },
+ deletePalette() {
+   this.transitionToRoute('palettes');
+ }
+```
+
+Add new actions to form buttons:
+```
+<button class="btn" {{action 'cancel'}}>Cancel</button>
+<button class="btn" {{action 'deletePalette'}}>Delete</button>
+<input class="btn" type="submit" value="Save">
+```
+
+YAY!!!!!!! ALL THE THINGS WORK!!!!!
+
+Deploying to page front - 
+`ember install ember-pagefront --app=YOUR_APP_NAME`
+`ember deploy production`
+
 
 ### <i class="icon-star"></i> Phase 4 - *Building a CRUD application using MVC Pattern*
 #### Working with Records
