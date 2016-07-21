@@ -590,23 +590,90 @@ Finally, let's add the styling for our special empty-palette. Remember, order ma
 > opacity: .8;
 >```
 
-### <i class="icon-star"></i> Phase 3 - *Building the Application Code*
-#### The anatomy of the web
-#### Bootstrapping a new Ember application
-#### The Ember Router
-#### Ember Routes
+
+# Color Palette Tutorial
+## Part 2 - Converting to Ember
+Emberitas Track One | July 16th, 2016 | Lydia Guarino, Instructor
+![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/Ember-Austin-Zoey-Half-sm.png?raw=true)
+
+
+---------
+
+Ember is a front-end javascript framework. Now that we have a little bit more context around what a framework is, let's learn about how to convert our *static* webpages to a *dynamic* web application with Ember.
+
+--------
+
+## Getting Started
+
+To start a new ember application, open your terminal window and run the following command from within the directory where you want your project to live.
 
 `ember new color-palette`
-Wait
+
+Do some dancing while you wait for the application dependencies to install.
+
+----
+
+Next, change directory (cd) into your newly created ember project directory. 
 
 `cd color-palette`
+
+To test that everything is working as expected, start your local server by running the following command from your command line:
+
 `ember server`
 
-`http://localhost:4200`
-Welcome to Ember
-Yay!
+Open your browser and navigate to the following URL, where your local server is currently running the ember application:
 
-`ember g route palettes`
+`http://localhost:4200`
+
+If you see "Welcome to Ember" or a happy little Tomster hamster, congrats! You have successfully created an Ember application!
+
+
+---
+## How to kill your server
+
+To avoid confusion, let's kill our server for now by pressing the `control` and `C` keys at the same time (on Mac) from within our terminal window.
+
+You will need to remember this command to stop your server if you need to restart it because you are seeing odd errors or so that you can easily run other commands from the terminal. 
+
+To restart your server, you'll simply run `ember server` again.
+
+-----
+
+## Understanding the Ember Router
+
+
+>From the Ember docs:
+>
+>Imagine we are writing a web app for managing a blog. At any given time, we should be able to answer questions like What post are they looking at? and Are they editing it? In Ember.js, the answer to these questions is determined by the URL.
+
+>The URL can be set in a few ways:
+
+>The user loads the app for the first time.
+The user changes the URL manually, such as by clicking the back button or by editing the address bar.
+The user clicks a link within the app.
+Some other event in the app causes the URL to change.
+
+>Regardless of how the URL becomes set, the Ember router then maps the current URL to one or more route handlers. A route handler can do several things:
+
+>It can render a template.
+It can load a model that is then available to the template.
+It can redirect to a new route, such as if the user isn't allowed to visit that part of the app.
+It can handle actions that involve changing a model or transitioning to a new route.
+
+------
+
+## Routes
+
+Since the Ember Router is the core of our application, we'll start building our application code by adding some route handlers for it to use. The routes represent the different pages in our application and will have individual URLs associated with them.
+
+We'll need three routes for our application:
+- A palettes route for our list view
+- A palettes/new route for our creation form
+- A palettes/edit route for our edit form
+
+To create some routes, Ember CLI provides us with some handy terminal commands that will automatically create some files for us. Since the framework provides the file structure for our application, using these *generators* is a handy way to quickly and confidently wire up the primary parts of our application to work with the Ember Router. 
+
+ `ember g route palettes`
 ```
 installing route
 	create app/routes/palettes.js
@@ -636,27 +703,99 @@ updating router
 installing route-test
 	create tests/unit/routes/palettes/edit-test.js
 ```
+
+
+___
+
+## Adding an application template
+
+You can see that we automatically got some templates when we ran the generator for our routes. For our application, we need a couple of additional special templates. 
+
+The first special template is the `application template`. This template allows us to wrap all of our other templates in some consistent context. In most applications, this is where things like your nav bar or footer might go - things that should appear on every page of your application.
+
+We'll be using this template to wrap all of our page content in our bootstrap responsive grid.
+
+`ember g template application`
+```
+installing template
+	create app/templates/application.hbs
+```
+---
+
+## Adding an index template
+
+
+Next, we need to add a template for our list view. Out of the box, Ember assumes that you might want to build pages with *nested* content - for example, you may want a route that shows a list of blog posts on one side of the screen and also renders an individual blog post on the right side of the screen when you click one of the items.
+
+This is a very powerful option, but not one that we will be using for our application.
+
+Since our design doesn't need any nested templates, we can add a special template called an `index` template to render our list view without any nested content:
+
 `ember g template palettes/index`
 ```
 installing template
 	create app/templates/palettes/index.hbs
 ```
+---
+## Adding a partial for our form
+
+Next, we need a special type of template called a *partial*.
+Partials allow you to create templates that will be reused in more than one place. Since both our new and edit pages will use exactly the same form, we can use a partial to use the same code in both places without having to have two copies of it. 
+
+>Note that Ember provides another structure that we could use for this purpose called a "component". For simplicity purposes, we'll stick to a partial for now, but it would be a good extension to research and implement our form as a component, should you feel up to the challenge.
+
+For now, let's go ahead and generate a partial template for our form. By convention, partial template names start with a dash.
+
+`ember g template -palette-form`
+```
+installing template
+	create app/templates/-palette-form.hbs
+```
+
+----------
+
+## Adding Bootstrap
+
+Remember adding bootstrap to our static pages by adding the `<link>` tag in our HTML head? In an Ember application, we can use a special install command to import bootstrap directly into our project, instead. There are a ton of awesome *add-ons* and libraries you can incorporate into your project, simply by running the install command with the library name.
+
+> One of my favorite resources for researching and installing Ember Add Ons is a fantastic website called the [Ember Observer.](https://emberobserver.com/)
+
+To install bootstrap, run the following command:
+
 `ember install ember-bootstrap`
 
-`ember g template _palette-form`
+--------
 
-Copy over templates:
+## Copying over our HTML templates
+
+Under the hood, Ember templates are just HTML with some special sauce that lets us dynamically swap out the content that is displayed on the page. This means that all of the HTML we wrote earlier today can be directly ported over to our new application.
+
+>The special sauce is some templating syntax called *Handlebars* - so named for the use of double curly braces to denote dynamic content within the template. The creators thought the curly braces looked like Handlebar mustaches: `{{dynamic-content}}`
+>
+> The particular flavor of Handlebars that modern Ember applications use is called HTMLbars and uses the file extension `.hbs`.
+
+Let's copy over our templates from this morning into our brand new *Handlebars* Ember templates.
+
+---
+## Using an application template
+
+Both our list view and our form view have some duplicate context that we can consolidate into our new application template.
+
+Ember uses a special handlebars helper to designate where any nested content will be rendered into the page. Since we want all of our pages to be rendered inside of the bootstrap grid, we can add the wrapper divs for the container, row and column around this special helper called the `{{outlet}}` helper. All of our other templates will get rendered into this special placeholder and will automatically include the wrapping content. 
 ```
 <!-- app/templates/application.hbs -->
-<body>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6 col-sm-8 col-md-offset-3 col-sm-offset-2">
-        {{outlet}}
-      </div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 col-sm-8 col-md-offset-3 col-sm-offset-2">
+      {{outlet}}
     </div>
-  </body>
+  </div>
+</div>
 ```
+---
+## Building our palettes list template
+
+Next, we'll take the list view content that is *different* than the form view content and copy it into our palettes/index template.
 ```
 <!-- app/templates/palettes/index.hbs -->
 <h1>Color Palettes</h1>
@@ -688,6 +827,10 @@ Copy over templates:
   <button class="btn" type="button" style="background-color:rgb(238,238,238)">238,238,238</button>
 </a>
 ```
+---
+## Using a partial for our form
+
+Now we'll copy over our HTML for our form into the partial template:
 
 ```
 <!-- app/templates/-palette-form.hbs -->
@@ -733,7 +876,32 @@ Copy over templates:
 </form>
 ```
 
-Copy over Styles
+----
+
+## Referencing our partial in our edit and new templates
+
+We've got two different templates where we want to use our form. Partials make this painless by letting us drop in a single line of Handlebars to pull in the content from the partial.
+
+We'll add the partial to the new and edit templates using the `{{partial}}` helper. 
+
+Note that since there is no further nested content for these templates, we can simply remove the `{{outlet}}` helpers that were automatically added to our templates when we generated our routes.
+
+```
+<!-- app/templates/palettes/new.hbs -->
+{{partial 'palette-form'}}
+```
+
+```
+<!-- app/templates/palettes/edit.hbs -->
+{{partial 'palette-form'}}
+```
+---
+
+## Adding in our styles
+
+Ember provides us a great place to add in our styles, right out of the box. We don't have to mess with linking up style sheets in Ember as long as we add our styles to the app.css file.
+
+We can simply copy our styles directly into the supplied styles/app.css file.
 
 ```
 /* app/styles/app.css */
@@ -831,22 +999,93 @@ h2 {
 }
 
 ```
-Add font
+---
+
+## Importing a Google Font
+
+The last thing we linked in our HTML file was the fancy Pacifico font from Google Fonts. In our Ember application, we can *import* the font directly into our css file with some special syntax.
+
+Add Pacifico to your css file by adding this line to the top of the file:
+
 `@import url(https://fonts.googleapis.com/css?family=Pacifico);`
 
 ----------------------
-Parity
--------------------
 
-replace `<a>` tags with `{{#link-to}} {{/link-to}}`
+##How are things looking?
+
+At this point, we've successfully converted everything from our static web pages over to our new Ember application context.
+
+Let's run our `ember server` command again from our terminal window and checkout how our application is looking!
+
+To take a look at our palettes list page, navigate to:
+`http://localhost:4200/palettes`
+
+To checkout how the form is looking, navigate to:
+`http://localhost:4200/edit`
+
+If your application looks like the image below - congratulations! You've reached parity with our static web pages and are ready to start layering on some Ember magic.
+
+![enter image description here](https://github.com/lydiaguarino/emberitas-images/blob/master/comps.png?raw=true)
+
+---
+#The Ember Magic Begins
+
+## Wiring up our interactions
+
+Ember creates *single-page applications*, which means that instead of the server sending us back an individual HTML page when we visit the application's URL, it actually sends us back the entire application all packaged up together. This means that things like links work a little differently than they did with our static pages. The Ember Router knows how to interpret URLs associated with each of the internal Ember Routes, but we have to use some special handlebars helpers so that it recognizes the difference between *internal* links and *external* links.
+
+---
+## Working with link-to helpers
+
+The first thing we need to swap out to get our application to work as expected are the `<a>` tags we were previously using to link between our two views. We'll replace them with some special Handlebars helpers called `{{#link-to}}` helpers, since all of our links are currently *internal* links, meaning they will transition the user to another page within our application:
+
+>A quick note about Handlebars helpers - many of the helpers are special replacements for standard HTML tags. The link-to helper is one such helper. This means you can add things like the class attribute inside of the opening handlebars tag, just like you would with an HTML tag.
+>
+>The major difference is that you will no longer have an href attribute on the link and will specify the internal route name in quotation marks instead.
+>
+> Here is an example of the structure of a link-to helper:
+> ```
+> {{#link-to 'name-of-route' class='my-class'}}
+>	 Link Content
+> {{/link-to}}
+> ```
+
+Replace all of the `<a>` tags in our list and form templates with the appropriate link-to helpers. Be sure to keep any classes or other attributes that were applied to the `<a>` tags.
+
+Here is a list of the three link-tos you will need and the naming conventions for the internal routes we'll be using:
 `{{#link-to 'palettes.edit'}}{{/link-to}}`
 `{{#link-to 'palettes.new'}}{{/link-to}}`
 `{{#link-to 'palettes'}}{{/link-to}}`
 
 
 ----------
-Dynamic Content
-Specify models:
+
+##Working with dynamic content
+
+Up to this point, we've been working with static web pages, where all the content is written directly in our HTML.
+
+To make our application dynamic, we will need to start thinking about the items in our list and the information that is backing our form and edit views as *dynamic data*.
+
+To start converting the items displayed in our list to dynamic data, let's take a look at how they could be represented as *JavaScript Objects*.
+
+JavaScript Objects are a way of describing an item by its traits. Let's take a look at what some objects might look like for our palette list view.
+
+> This is a good time to talk about two very important structures in JavaScript - Arrays and Objects.
+>
+>**Arrays** are ordered lists of items. They use the following syntax:
+>`[ thing-one, thing-two, thing-three ]`
+>
+>Ordered lists, or *arrays* are incredibly useful when you want to represent a collection of things. Our list view will have a collection of palettes as its dynamic data and we'll be using an array to represent it.
+>
+>The second important structure is called an **Object**. Objects are data structures that allow you to describe an item by a list of traits. They are structured to include a series of key-value pairs where the key is the name of the trait.
+>
+>They look something like this:
+>`{ name: 'Jane', age: 27, eyeColor: 'green' }`
+>
+>Each individual palette in our list can be represented as an object. Note that the value of a key in an object can essentially be any type of data structure, including another object or an array of objects.
+
+Now that we know a little bit about how objects and arrays look and work, let's set the model (the dynamic data backing our template) on our palettes route to use an array of objects representing our collection of palettes.
+
 ```
 /* app/routes/palettes.js */
 
@@ -884,6 +1123,8 @@ export default Ember.Route.extend({
 });
 
 ```
+The models for our edit and new routes will be a single object -representing a single item in our palettes collection. Let's update the model hook for these two routes to return a single palette object.
+
 ```
 /* app/routes/palettes/edit.js and app/routes/palettes/new.js */
 import Ember from 'ember';
@@ -907,7 +1148,33 @@ export default Ember.Route.extend({
 ```
 
 ----------
-Swap out lists for `{{#each}}{{/each}}` and convert to static context with dynamic content
+
+## Adding dynamic placeholders to our templates
+
+Now that we have some dynamic data to back our templates, we need to update our templates to use dynamic placeholders. You can think of these as the blanks in a madlibs document.
+
+First, let's update our palettes list view to dynamically display each item in our list of palettes, instead of hard-coding our two example palettes.
+
+We'll do this with another special Handlebars helper called an `{{#each}}` helper.
+
+Each helpers can be used with any collection of data that is stored as an array. The each helper *loops* over the array and performs the same action for each item in the array. This gives us a streamlined way to add a list elements to our HTML for each item in the array.
+
+The structure is pretty straight-forward, but the syntax can be a little confusing when you first look at it.
+
+Here's how the syntax works:
+
+```
+{{#each [array to loop over] as |item in array|}}
+	<div>Repeated content for each {{item}}</div>
+{{/each}}
+```
+
+>The "|" characters in the opening each tag are called *pipes* - I like to think of them as creating a little chute that drops the variable name you want to use for an individual item into the nested block - kind of like one of the portal pipes in Super Mario. For the individual items, you can use whatever name you'd like, as long as you pass it into the nested block via the pipes.
+
+For our list of palettes view, we have TWO each loops we need to make - one for the collection of palettes, and one for the collection of colors within a palette.
+
+Let's take a look:
+
 ```
 <!-- app/templates/palettes/index.hbs -->
 ...
@@ -920,6 +1187,10 @@ Swap out lists for `{{#each}}{{/each}}` and convert to static context with dynam
   {{/link-to}}
 {{/each}}
 ```
+
+Here, we're looping over all the palettes in our model and displaying the palette name. We're then looping over each color in the palette and adding one of our buttons with the style attribute dynamically set to match the styleString property of the color.
+
+Now, we'll do the same to dynamically display the colors in the palette preview of our form:
 
 ```
 <!-- app/templates/-palette-form.hbs -->
@@ -939,6 +1210,8 @@ Swap out lists for `{{#each}}{{/each}}` and convert to static context with dynam
 
 ```
 ----------
+
+#Working with Controllers
 
 Controllers and actions
 
@@ -1287,21 +1560,4 @@ YAY!!!!!!! ALL THE THINGS WORK!!!!!
 Deploying to page front - 
 `ember install ember-pagefront --app=YOUR_APP_NAME`
 `ember deploy production`
-
-
-### <i class="icon-star"></i> Phase 4 - *Building a CRUD application using MVC Pattern*
-#### Working with Records
-#### Intro to Model View Controller (MVC) Pattern - or in our case, M *T* C
-#### Templates
-#### Models
-#### Controllers
-
-### <i class="icon-star"></i> Phase 5 - *Persistence*
-#### Understanding "front-end" vs "back-end"
-#### Intro to Ember Data
-#### Intro to working with APIs (Firebase)
-
-### <i class="icon-star"></i> Phase 6 - *Deployment - Making the application available to users*
-#### Understanding DNS and hosting
-#### Intro to Pagefront
 
